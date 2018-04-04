@@ -12,18 +12,8 @@
     top: 20px;
     left: 20px;
     cursor: move;
-}
-
-#drawing-mode {
-    margin-bottom: 10px;
-    vertical-align: top;
-}
-
-#drawing-mode-options {
     display: inline-block;
     vertical-align: top;
-    margin-bottom: 10px;
-    margin-top: 10px;
     background: #f5f2f0;
     padding: 10px;
 }

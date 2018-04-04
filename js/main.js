@@ -27,14 +27,19 @@ $(function() {
 
     let canvas = null;
 
+    let drawingColor = $('#drawing-color'),
+        drawingLineWidth = $('#drawing-line-width');
+
     currentEditorValue.child("content").once("value", function (data) {
 
         canvas = new fabric.Canvas('c', {
-            isDrawingMode: true
+            isDrawingMode: true,
+            selection: false
         });
 
-        let drawingColor = $('#drawing-color'),
-            drawingLineWidth = $('#drawing-line-width');
+
+        let c = new Circle(canvas);
+        let a = new Arrow(canvas);
 
         $('#clear-canvas').on('click', function () {
             clear();
@@ -66,10 +71,20 @@ $(function() {
 
         $("#line-drawing").on('click', function () {
            canvas.isDrawingMode = true;
+           c.desactive();
+           a.desactive();
+        });
+
+        $("#circle-drawing").on('click', function () {
+           canvas.isDrawingMode = false;
+           c.active();
+           a.desactive();
         });
 
         $("#arrow-drawing").on('click', function () {
            canvas.isDrawingMode = false;
+           a.active();
+           c.desactive();
         });
 
         function setBackground(backgroundImage) {
@@ -101,8 +116,6 @@ $(function() {
         }
 
         editorChange();
-        //new Arrow(canvas);
-        //new Circle(canvas);
 
         currentEditorValue.child("map").on("value", function (opt) {
             let value = opt.val();
@@ -120,7 +133,7 @@ $(function() {
 
         let syncing = false;
 
-        canvas.on("object:added", function(data) {
+        canvas.on("path:created", function(data) {
 
             if (syncing) {
                 return;
@@ -129,6 +142,27 @@ $(function() {
             currentEditorValue.update({
                 content: JSON.stringify(canvas)
             });
+
+            console.log(JSON.stringify(data.path));
+
+            queueRef.push().set({
+                event: JSON.stringify(data.path),
+                by: uID,
+                time: Date.now().toString()
+            });
+        });
+
+        canvas.on("object:finish", function(data) {
+
+            if (syncing) {
+                return;
+            }
+
+            currentEditorValue.update({
+                content: JSON.stringify(canvas)
+            });
+
+            console.log(JSON.stringify(data.target));
 
             queueRef.push().set({
                 event: JSON.stringify(data.target),
@@ -226,162 +260,177 @@ $(function() {
     }
 
 
-    /*var Circle = (function() {
+    var Circle = (function() {
         function Circle(canvas) {
             this.canvas = canvas;
             this.className = 'Circle';
             this.isDrawing = false;
+            this.isActive = false;
             this.bindEvents();
         }
 
-        Circle.prototype.bindEvents = function() {
-            var inst = this;
-            inst.canvas.on('mouse:down', function(o) {
-                inst.onMouseDown(o);
-            });
-            inst.canvas.on('mouse:move', function(o) {
-                inst.onMouseMove(o);
-            });
-            inst.canvas.on('mouse:up', function(o) {
-                inst.onMouseUp(o);
-            });
-            inst.canvas.on('object:moving', function(o) {
-                inst.disable();
-            })
-        }
+        let origX, origY;
 
-        Circle.prototype.onMouseUp = function(o) {
-            var inst = this;
+        Circle.prototype.bindEvents = function() {
+            let inst = this;
+            inst.canvas.on('mouse:down', function(event) {
+                if (inst.isActive) inst.onMouseDown(event);
+            });
+            inst.canvas.on('mouse:move', function(event) {
+                if (inst.isActive) inst.onMouseMove(event);
+            });
+            inst.canvas.on('mouse:up', function(event) {
+                if (inst.isActive) inst.onMouseUp(event);
+            });
+            inst.canvas.on('object:moving', function() {
+                if (inst.isActive) inst.disable();
+            })
+        };
+
+        Circle.prototype.onMouseUp = function() {
+            let inst = this;
+            if (inst.isEnable()) canvas.fire('object:finish', { target: inst.canvas.getActiveObject() });
             inst.disable();
         };
 
-        Circle.prototype.onMouseMove = function(o) {
-            var inst = this;
+        Circle.prototype.onMouseMove = function(event) {
+            let inst = this;
             if (!inst.isEnable()) {
                 return;
             }
 
-            var pointer = inst.canvas.getPointer(o.e);
-            var activeObj = inst.canvas.getActiveObject();
-
-            activeObj.stroke = 'red',
-                activeObj.strokeWidth = 5;
-            activeObj.fill = 'red';
+            let pointer = inst.canvas.getPointer(event.e);
+            let activeObj = inst.canvas.getActiveObject();
 
             if (origX > pointer.x) {
-                activeObj.set({
-                    left: Math.abs(pointer.x)
-                });
+                activeObj.set({ left: Math.abs(pointer.x) });
             }
 
             if (origY > pointer.y) {
-                activeObj.set({
-                    top: Math.abs(pointer.y)
-                });
+                activeObj.set({ top: Math.abs(pointer.y) });
             }
 
             activeObj.set({
-                rx: Math.abs(origX - pointer.x) / 2
+                rx: Math.abs(origX - pointer.x) / 2,
+                ry: Math.abs(origY - pointer.y) / 2,
+                width: Math.abs(origX - pointer.x),
+                height: Math.abs(origY - pointer.y)
             });
-            activeObj.set({
-                ry: Math.abs(origY - pointer.y) / 2
-            });
+
             activeObj.setCoords();
             inst.canvas.renderAll();
         };
 
-        Circle.prototype.onMouseDown = function(o) {
-            var inst = this;
+        Circle.prototype.onMouseDown = function(event) {
+            let inst = this;
             inst.enable();
 
-            var pointer = inst.canvas.getPointer(o.e);
+            let pointer = inst.canvas.getPointer(event.e);
             origX = pointer.x;
             origY = pointer.y;
 
-            var ellipse = new fabric.Ellipse({
+            let ellipse = new fabric.Ellipse({
                 top: origY,
                 left: origX,
+                originX: 'left',
+                originY: 'top',
+                width: pointer.x - origX,
+                height: pointer.y - origY,
                 rx: 0,
                 ry: 0,
-                transparentCorners: false,
+                transparentCorners: true,
                 hasBorders: false,
-                hasControls: false
+                hasControls: false,
+                stroke: drawingColor.val(),
+                strokeWidth: parseInt(drawingLineWidth.val()),
+                fill: 'rgba(0,0,0,0)'
             });
 
-            inst.canvas.add(ellipse).setActiveObject(ellipse);
+            inst.canvas.add(ellipse).setActiveObject(ellipse)
         };
 
         Circle.prototype.isEnable = function() {
-            if (this.canvas.isDrawingMode) return false;
-            else return this.isDrawing;
-        }
+            return this.isDrawing;
+        };
 
         Circle.prototype.enable = function() {
             this.isDrawing = true;
-        }
+        };
 
         Circle.prototype.disable = function() {
             this.isDrawing = false;
-        }
+        };
+
+        Circle.prototype.active = function () {
+            this.isActive = true;
+        };
+
+        Circle.prototype.desactive = function () {
+            this.isActive = false;
+        };
 
         return Circle;
-    }());*/
+    }());
 
-    /*var Arrow = (function() {
+    var Arrow = (function() {
         function Arrow(canvas) {
             this.canvas = canvas;
             this.className = 'Arrow';
             this.isDrawing = false;
+            this.isActive = false;
             this.bindEvents();
         }
 
         Arrow.prototype.bindEvents = function() {
-            var inst = this;
+            let inst = this;
             inst.canvas.on('mouse:down', function(o) {
-                inst.onMouseDown(o);
+                if (inst.isActive) inst.onMouseDown(o);
             });
             inst.canvas.on('mouse:move', function(o) {
-                inst.onMouseMove(o);
+                if (inst.isActive) inst.onMouseMove(o);
             });
             inst.canvas.on('mouse:up', function(o) {
-                inst.onMouseUp(o);
+                if (inst.isActive) inst.onMouseUp(o);
             });
             inst.canvas.on('object:moving', function(o) {
-                inst.disable();
+                if (inst.isActive) inst.disable();
             })
-        }
+        };
 
         Arrow.prototype.onMouseUp = function(o) {
-            var inst = this;
+            let inst = this;
+            if (inst.isEnable()) canvas.fire('object:finish', { target: inst.canvas.getActiveObject() });
             inst.disable();
         };
 
         Arrow.prototype.onMouseMove = function(o) {
-            var inst = this;
+            let inst = this;
             if (!inst.isEnable()) {
                 return;
             }
 
-            var pointer = inst.canvas.getPointer(o.e);
-            var activeObj = inst.canvas.getActiveObject();
+            let pointer = inst.canvas.getPointer(o.e);
+            let activeObj = inst.canvas.getActiveObject();
+
             activeObj.set({
                 x2: pointer.x,
                 y2: pointer.y
             });
+
             activeObj.setCoords();
             inst.canvas.renderAll();
         };
 
         Arrow.prototype.onMouseDown = function(o) {
-            var inst = this;
+            let inst = this;
             inst.enable();
-            var pointer = inst.canvas.getPointer(o.e);
 
-            var points = [pointer.x, pointer.y, pointer.x, pointer.y];
-            var line = new fabric.LineArrow(points, {
-                strokeWidth: 5,
-                fill: 'red',
-                stroke: 'red',
+            let pointer = inst.canvas.getPointer(o.e);
+            let points = [pointer.x, pointer.y, pointer.x, pointer.y];
+            let line = new fabric.Arrow(points, {
+                strokeWidth: parseInt(drawingLineWidth.val()),
+                fill: drawingColor.val(),
+                stroke: drawingColor.val(),
                 originX: 'center',
                 originY: 'center',
                 hasBorders: false,
@@ -392,8 +441,7 @@ $(function() {
         };
 
         Arrow.prototype.isEnable = function() {
-            if (this.canvas.isDrawingMode) return false;
-            else return this.isDrawing;
+            return this.isDrawing;
         };
 
         Arrow.prototype.enable = function() {
@@ -404,7 +452,15 @@ $(function() {
             this.isDrawing = false;
         };
 
+        Arrow.prototype.active = function () {
+            this.isActive = true;
+        };
+
+        Arrow.prototype.desactive = function () {
+            this.isActive = false;
+        };
+
         return Arrow;
-    }());*/
+    }());
 
 });
