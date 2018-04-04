@@ -11,6 +11,8 @@ $(function() {
 
     firebase.initializeApp(config);
 
+    $(".tools").draggable();
+
     let roomID = getUrlParameter("room") || "prueba1";
 
     let uID = Math.floor(Math.random() * 100000).toString();
@@ -62,6 +64,14 @@ $(function() {
             drawingColor.val(value);
         });
 
+        $("#line-drawing").on('click', function () {
+           canvas.isDrawingMode = true;
+        });
+
+        $("#arrow-drawing").on('click', function () {
+           canvas.isDrawingMode = false;
+        });
+
         function setBackground(backgroundImage) {
             if (backgroundImage === "none") {
                 canvas.backgroundImage = 0;
@@ -91,6 +101,8 @@ $(function() {
         }
 
         editorChange();
+        //new Arrow(canvas);
+        //new Circle(canvas);
 
         currentEditorValue.child("map").on("value", function (opt) {
             let value = opt.val();
@@ -102,6 +114,7 @@ $(function() {
             }
         });
 
+        $(document).on('keydown', null, 'F2', clear);
 
         let queueRef = currentEditorValue.child("queue");
 
@@ -211,5 +224,187 @@ $(function() {
 
         return null;
     }
+
+
+    /*var Circle = (function() {
+        function Circle(canvas) {
+            this.canvas = canvas;
+            this.className = 'Circle';
+            this.isDrawing = false;
+            this.bindEvents();
+        }
+
+        Circle.prototype.bindEvents = function() {
+            var inst = this;
+            inst.canvas.on('mouse:down', function(o) {
+                inst.onMouseDown(o);
+            });
+            inst.canvas.on('mouse:move', function(o) {
+                inst.onMouseMove(o);
+            });
+            inst.canvas.on('mouse:up', function(o) {
+                inst.onMouseUp(o);
+            });
+            inst.canvas.on('object:moving', function(o) {
+                inst.disable();
+            })
+        }
+
+        Circle.prototype.onMouseUp = function(o) {
+            var inst = this;
+            inst.disable();
+        };
+
+        Circle.prototype.onMouseMove = function(o) {
+            var inst = this;
+            if (!inst.isEnable()) {
+                return;
+            }
+
+            var pointer = inst.canvas.getPointer(o.e);
+            var activeObj = inst.canvas.getActiveObject();
+
+            activeObj.stroke = 'red',
+                activeObj.strokeWidth = 5;
+            activeObj.fill = 'red';
+
+            if (origX > pointer.x) {
+                activeObj.set({
+                    left: Math.abs(pointer.x)
+                });
+            }
+
+            if (origY > pointer.y) {
+                activeObj.set({
+                    top: Math.abs(pointer.y)
+                });
+            }
+
+            activeObj.set({
+                rx: Math.abs(origX - pointer.x) / 2
+            });
+            activeObj.set({
+                ry: Math.abs(origY - pointer.y) / 2
+            });
+            activeObj.setCoords();
+            inst.canvas.renderAll();
+        };
+
+        Circle.prototype.onMouseDown = function(o) {
+            var inst = this;
+            inst.enable();
+
+            var pointer = inst.canvas.getPointer(o.e);
+            origX = pointer.x;
+            origY = pointer.y;
+
+            var ellipse = new fabric.Ellipse({
+                top: origY,
+                left: origX,
+                rx: 0,
+                ry: 0,
+                transparentCorners: false,
+                hasBorders: false,
+                hasControls: false
+            });
+
+            inst.canvas.add(ellipse).setActiveObject(ellipse);
+        };
+
+        Circle.prototype.isEnable = function() {
+            if (this.canvas.isDrawingMode) return false;
+            else return this.isDrawing;
+        }
+
+        Circle.prototype.enable = function() {
+            this.isDrawing = true;
+        }
+
+        Circle.prototype.disable = function() {
+            this.isDrawing = false;
+        }
+
+        return Circle;
+    }());*/
+
+    /*var Arrow = (function() {
+        function Arrow(canvas) {
+            this.canvas = canvas;
+            this.className = 'Arrow';
+            this.isDrawing = false;
+            this.bindEvents();
+        }
+
+        Arrow.prototype.bindEvents = function() {
+            var inst = this;
+            inst.canvas.on('mouse:down', function(o) {
+                inst.onMouseDown(o);
+            });
+            inst.canvas.on('mouse:move', function(o) {
+                inst.onMouseMove(o);
+            });
+            inst.canvas.on('mouse:up', function(o) {
+                inst.onMouseUp(o);
+            });
+            inst.canvas.on('object:moving', function(o) {
+                inst.disable();
+            })
+        }
+
+        Arrow.prototype.onMouseUp = function(o) {
+            var inst = this;
+            inst.disable();
+        };
+
+        Arrow.prototype.onMouseMove = function(o) {
+            var inst = this;
+            if (!inst.isEnable()) {
+                return;
+            }
+
+            var pointer = inst.canvas.getPointer(o.e);
+            var activeObj = inst.canvas.getActiveObject();
+            activeObj.set({
+                x2: pointer.x,
+                y2: pointer.y
+            });
+            activeObj.setCoords();
+            inst.canvas.renderAll();
+        };
+
+        Arrow.prototype.onMouseDown = function(o) {
+            var inst = this;
+            inst.enable();
+            var pointer = inst.canvas.getPointer(o.e);
+
+            var points = [pointer.x, pointer.y, pointer.x, pointer.y];
+            var line = new fabric.LineArrow(points, {
+                strokeWidth: 5,
+                fill: 'red',
+                stroke: 'red',
+                originX: 'center',
+                originY: 'center',
+                hasBorders: false,
+                hasControls: false
+            });
+
+            inst.canvas.add(line).setActiveObject(line);
+        };
+
+        Arrow.prototype.isEnable = function() {
+            if (this.canvas.isDrawingMode) return false;
+            else return this.isDrawing;
+        };
+
+        Arrow.prototype.enable = function() {
+            this.isDrawing = true;
+        };
+
+        Arrow.prototype.disable = function() {
+            this.isDrawing = false;
+        };
+
+        return Arrow;
+    }());*/
 
 });

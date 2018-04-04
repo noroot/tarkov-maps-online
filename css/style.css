@@ -11,6 +11,7 @@
     position: absolute;
     top: 20px;
     left: 20px;
+    cursor: move;
 }
 
 #drawing-mode {
@@ -36,6 +37,7 @@
     width: 20px;
     display:  inline-block;
     vertical-align: middle;
+    cursor: pointer;
 }
 
 label {
