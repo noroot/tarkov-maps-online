@@ -9,34 +9,36 @@
 <body>
 <div id="wrapper" style="display: none">
     <div class="canvas-container">
-        <canvas id="c" width="1400" height="900"></canvas>
+        <canvas id="c" width="1920" height="1080"></canvas>
     </div>
 
     <div class="tools">
         <div id="drawing-mode-options">
-            <label for="drawing-mode-selector">Mode:</label>
-            <select id="drawing-mode-selector">
-                <option>Pencil</option>
-                <option>Circle</option>
-                <option>Spray</option>
-            </select><br>
-
             <label for="drawing-line-width">Line width:</label>
-            <span class="info">10</span>
-            <input type="range" value="10" min="0" max="100" id="drawing-line-width"><br>
+            <span class="info">5</span>
+            <input type="range" value="5" min="1" max="15" id="drawing-line-width"><br>
 
             <label for="drawing-color">Line color:</label>
-            <input type="color" value="#ff0100" id="drawing-color"><br>
+            <div class="colors">
+                <div id="#ff0000" style="background-color: #ff0000"></div>
+                <div id="#00ff00" style="background-color: #00ff00"></div>
+                <div id="#000000" style="background-color: #000000"></div>
+                <div id="#ffffff" style="background-color: #ffffff"></div>
+                <div id="#0000ff" style="background-color: #0000ff"></div>
+            </div>
+            <input type="color" value="#ff0100" id="drawing-color">
+            <br>
 
-            <label for="background-options">Mode:</label>
+            <label for="background-options">Mapa:</label>
             <select id="background-options">
-                <option value="none">None</option>
-                <option value="map1">Mapa 1</option>
-                <option value="map2">Mapa 2</option>
+                <option value="none">Ninguno</option>
+                <option value="map1">Shoreline</option>
+                <option value="map2">Customs</option>
+                <option value="map3">Woods</option>
+                <option value="map4">Shoreline resort</option>
             </select><br>
 
-            <label for="clear-canvas">Clear:</label>
-            <button id="clear-canvas">Clear</button>
+            <button id="clear-canvas">Limpiar</button>
         </div>
     </div>
 </div>

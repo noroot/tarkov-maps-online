@@ -38,13 +38,9 @@ $(function() {
             clear();
         });
 
-        $('#drawing-mode-selector').on('change', function () {
-            canvas.freeDrawingBrush = new fabric[this.value + 'Brush'](canvas);
-            editorChange();
-        });
-
         $('#background-options').on('change', function () {
             setBackground(this.value);
+            clear();
 
             currentEditorValue.update({
                 map: this.value
@@ -58,6 +54,12 @@ $(function() {
         drawingLineWidth.on('change', function () {
             canvas.freeDrawingBrush.width = parseInt(this.value, 10) || 1;
             $(this).prev("span").text(this.value);
+        });
+
+        $(".colors div").on('click', function () {
+            let value = $(this).attr('id');
+            canvas.freeDrawingBrush.color = value;
+            drawingColor.val(value);
         });
 
         function setBackground(backgroundImage) {

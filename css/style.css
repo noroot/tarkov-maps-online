@@ -3,15 +3,14 @@
 }
 
 .canvas-container {
-    width: 1400px;
-    height: 900px;
+    width: 1920px;
+    height: 1080px;
 }
 
 .tools {
     position: absolute;
     top: 20px;
     left: 20px;
-
 }
 
 #drawing-mode {
@@ -28,9 +27,21 @@
     padding: 10px;
 }
 
+.colors {
+    display: inline-block;
+}
+
+.colors div {
+    height: 20px;
+    width: 20px;
+    display:  inline-block;
+    vertical-align: middle;
+}
+
 label {
     display: inline-block;
     width: 130px;
+    margin-bottom: 10px;
 }
 
 .info {
