@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Real time drawing</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/normalize.css@8.0.0/normalize.css">
+    <script src="fabric.js"></script>
+
+<body>
+<div id="wrapper">
+    <div class="canvas-container">
+        <canvas id="c" width="1400" height="900"></canvas>
+    </div>
+
+    <div class="tools">
+        <div id="drawing-mode-options">
+            <label for="drawing-mode-selector">Mode:</label>
+            <select id="drawing-mode-selector">
+                <option>Pencil</option>
+                <option>Circle</option>
+                <option>Spray</option>
+            </select><br>
+
+            <label for="drawing-line-width">Line width:</label>
+            <span class="info">10</span>
+            <input type="range" value="10" min="0" max="100" id="drawing-line-width"><br>
+
+            <label for="drawing-color">Line color:</label>
+            <input type="color" value="#ff0100" id="drawing-color"><br>
+
+            <label for="background-options">Mode:</label>
+            <select id="background-options">
+                <option value="none">None</option>
+                <option value="map1">Mapa 1</option>
+                <option value="map2">Mapa 2</option>
+            </select><br>
+
+            <label for="clear-canvas">Clear:</label>
+            <button id="clear-canvas">Clear</button>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script id="main">
+    $(function () {
+
+        let canvas = new fabric.Canvas('c', {
+            isDrawingMode: true
+        });
+
+        let drawingColor = $('#drawing-color'),
+            drawingLineWidth = $('#drawing-line-width');
+
+        $('#clear-canvas').on('click', function () {
+            canvas.clear();
+            setDefaultBackground();
+        });
+
+        $('#drawing-mode-selector').on('change', function () {
+            canvas.freeDrawingBrush = new fabric[this.value + 'Brush'](canvas);
+            newChanges();
+        });
+
+        $('#background-options').on('change', function () {
+            if (this.value === "none") setDefaultBackground();
+            else setBackground(this.value);
+        });
+
+
+        drawingColor.on("change", function () {
+            canvas.freeDrawingBrush.color = this.value;
+        });
+
+        drawingLineWidth.on('change', function () {
+            canvas.freeDrawingBrush.width = parseInt(this.value, 10) || 1;
+            $(this).prev("span").text(this.value);
+        });
+
+        newChanges();
+        setDefaultBackground();
+
+        function setBackground(backgroundImage) {
+            fabric.Image.fromURL('img/' + backgroundImage + '.png', function(img) {
+                canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas), {
+                    scaleX: canvas.width / img.width,
+                    scaleY: canvas.height / img.height
+                });
+            });
+        }
+
+        function setDefaultBackground() {
+            canvas.backgroundImage = 0;
+            canvas.setBackgroundColor({source: 'img/grid.png', repeat: 'repeat'}, function () {
+                canvas.renderAll();
+            });
+        }
+
+        function newChanges() {
+            if (canvas.freeDrawingBrush) {
+                canvas.freeDrawingBrush.color = drawingColor.val();
+                canvas.freeDrawingBrush.width = parseInt(drawingLineWidth.val(), 10) || 1;
+            }
+        }
+
+
+
+        /*function observe(eventName) {
+            canvas.on(eventName, function (opt) {
+                console.log(eventName + " - " + JSON.stringify(opt.target))
+            });
+        }
+
+        function observeObj(eventName) {
+            canvas.getObjects().forEach(function (o) {
+                o.on(eventName, function (opt) {
+                    log(eventName, opt, o.fill)
+                });
+            });
+        }
+
+        observe('object:modified');
+
+        observe('object:moving');
+        observe('object:scaling');
+        observe('object:rotating');
+        observe('object:skewing');
+
+        observe('before:selection:cleared');
+        observe('selection:cleared');
+        observe('selection:created');
+        observe('selection:updated');
+
+        observe('drop');
+        observe('dragover');
+        observe('dragenter');
+        observe('dragleave');
+
+        //observe('after:render');
+
+        //observe("path:created");
+        observe("object:added");
+        observe("object:removed");
+
+        observeObj('moving');
+        observeObj('scaling');
+        observeObj('rotating');
+        observeObj('skewing');
+
+        observeObj('drop');
+        observeObj('dragover');
+        observeObj('dragenter');
+        observeObj('dragleave');
+
+        let nuevo = {
+            "type": "path",
+            "version": "2.2.3",
+            "originX": "left",
+            "originY": "top",
+            "left": 177,
+            "top": 78.97000000000003,
+            "width": 88,
+            "height": 230.06,
+            "fill": null,
+            "stroke": "#005e7a",
+            "strokeWidth": 30,
+            "strokeDashArray": null,
+            "strokeLineCap": "round",
+            "strokeLineJoin": "round",
+            "strokeMiterLimit": 10,
+            "scaleX": 1,
+            "scaleY": 1,
+            "angle": 0,
+            "flipX": false,
+            "flipY": false,
+            "opacity": 1,
+            "shadow": {"color": "#005e7a", "blur": 0, "offsetX": 0, "offsetY": 0, "affectStroke": true},
+            "visible": true,
+            "clipTo": null,
+            "backgroundColor": "",
+            "fillRule": "nonzero",
+            "paintFirst": "fill",
+            "globalCompositeOperation": "source-over",
+            "transformMatrix": null,
+            "skewX": 0,
+            "skewY": 0,
+            "path": [["M", 280, 93.97], ["Q", 280, 94, 280, 95.5], ["Q", 280, 97, 271, 125.5], ["Q", 262, 154, 250, 186.5], ["Q", 238, 219, 225.5, 244.5], ["Q", 213, 270, 205.5, 288.5], ["Q", 198, 307, 195, 313.5], ["Q", 192, 320, 192, 322], ["L", 192, 324.03]]
+        };
+
+        console.log(fabric.util.string.camelize(fabric.util.string.capitalize(nuevo.type)));
+
+        var obj = new fabric[fabric.util.string.capitalize(nuevo.type)].fromObject(nuevo, function (obj) {
+            canvas.add(obj);
+        });*/
+    });
+</script>
+</body>
+
+</html>

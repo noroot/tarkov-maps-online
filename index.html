@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Escape from Tarkov Maps Editor</title>
+
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/style.css">
+<body>
+<div id="wrapper" style="display: none">
+    <div class="canvas-container">
+        <canvas id="c" width="1400" height="900"></canvas>
+    </div>
+
+    <div class="tools">
+        <div id="drawing-mode-options">
+            <label for="drawing-mode-selector">Mode:</label>
+            <select id="drawing-mode-selector">
+                <option>Pencil</option>
+                <option>Circle</option>
+                <option>Spray</option>
+            </select><br>
+
+            <label for="drawing-line-width">Line width:</label>
+            <span class="info">10</span>
+            <input type="range" value="10" min="0" max="100" id="drawing-line-width"><br>
+
+            <label for="drawing-color">Line color:</label>
+            <input type="color" value="#ff0100" id="drawing-color"><br>
+
+            <label for="background-options">Mode:</label>
+            <select id="background-options">
+                <option value="none">None</option>
+                <option value="map1">Mapa 1</option>
+                <option value="map2">Mapa 2</option>
+            </select><br>
+
+            <label for="clear-canvas">Clear:</label>
+            <button id="clear-canvas">Clear</button>
+        </div>
+    </div>
+</div>
+<div id="loader"></div>
+
+<script type="text/javascript" src="js/firebase.js"></script>
+<script type="text/javascript" src="js/fabric.min.js"></script>
+<script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="js/main.js"></script>
+
+</body>
+</html>
