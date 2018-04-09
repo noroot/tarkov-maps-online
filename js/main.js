@@ -13,7 +13,7 @@ $(function() {
 
     $(".tools").draggable();
 
-    let roomID = getUrlParameter("room") || "prueba1";
+    let roomID = getUrlParameter("id") || "prueba";
 
     let uID = Math.floor(Math.random() * 100000).toString();
 
@@ -36,7 +36,6 @@ $(function() {
             isDrawingMode: true,
             selection: false
         });
-
 
         let c = new Circle(canvas);
         let a = new Arrow(canvas);
@@ -127,7 +126,7 @@ $(function() {
             }
         });
 
-        $(document).on('keydown', null, 'F2', clear);
+        $().on('keydown', null, 'F2', clear);
 
         let queueRef = currentEditorValue.child("queue");
 

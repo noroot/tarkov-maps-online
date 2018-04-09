@@ -5,54 +5,37 @@
     <title>Escape from Tarkov Maps Editor</title>
 
     <link rel="stylesheet" href="css/normalize.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style-index.css">
 <body>
-<div id="wrapper" style="display: none">
-    <div class="canvas-container">
-        <canvas id="c" width="1920" height="1080"></canvas>
+
+<main>
+    <div class="main_content">
+        <input id="roomID" class="input-room" size="20" maxlength="20" type="text" placeholder="Room ID">
+        <input id="signup" class="buttom-room" value="Enter" type="submit">
     </div>
+</main>
 
-    <div class="tools">
-            <label for="drawing-line-width">Line width:</label>
-            <span class="info">5</span>
-            <input type="range" value="5" min="1" max="15" id="drawing-line-width"><br>
-
-            <label for="drawing-color">Line color:</label>
-            <div class="colors">
-                <div id="#ff0000" style="background-color: #ff0000"></div>
-                <div id="#00ff00" style="background-color: #00ff00"></div>
-                <div id="#000000" style="background-color: #000000"></div>
-                <div id="#ffffff" style="background-color: #ffffff"></div>
-                <div id="#0000ff" style="background-color: #0000ff"></div>
-            </div>
-            <input type="color" value="#ff0100" id="drawing-color">
-            <br>
-
-            <label for="background-options">Mapa:</label>
-            <select id="background-options">
-                <option value="none">Ninguno</option>
-                <option value="map1">Shoreline</option>
-                <option value="map2">Customs</option>
-                <option value="map3">Woods</option>
-                <option value="map4">Shoreline resort</option>
-            </select><br>
-
-            <button id="clear-canvas">Limpiar</button>
-            <button id="line-drawing">Linea</button>
-            <button id="arrow-drawing">Flecha</button>
-            <button id="circle-drawing">Circulo</button>
-        </div>
-
-</div>
-<div id="loader"></div>
-
-<script type="text/javascript" src="js/firebase.js"></script>
-<script type="text/javascript" src="js/fabric.min.js"></script>
 <script type="text/javascript" src="js/jquery-3.3.1.min.js"></script>
-<script type="text/javascript" src="js/jquery-ui.min.js"></script>
 <script type="text/javascript" src="js/jquery.hotkeys.js"></script>
-<script type="text/javascript" src="js/arrow.js"></script>
-<script type="text/javascript" src="js/main.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $(".buttom-room").on('click', function () {
+            let input = $(".input-room").val();
+            if (input) location.href = 'room.html?id=' + input;
+        });
+
+        $(".input-room")
+            .on('input', function () {
+                let input = $(this);
+                input.val(input.val().replace(eval('/[^A-Za-z0-9]/g'), ''));
+            })
+            .on('keydown', null, 'return', function() {
+                $(".buttom-room").trigger('click');
+            });
+
+
+    });
+</script>
 
 </body>
 </html>
