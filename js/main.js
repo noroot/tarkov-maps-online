@@ -13,13 +13,13 @@ $(function() {
 
     $(".tools").draggable();
 
-    let roomID = getUrlParameter("id") || "prueba";
+    let roomID = getUrlParameter('id') || "prueba";
 
     let uID = Math.floor(Math.random() * 100000).toString();
 
     let db = firebase.database();
 
-    let rooms = db.ref("rooms");
+    let rooms = db.ref('rooms');
 
     let currentRoom = rooms.child(roomID);
 
@@ -260,7 +260,7 @@ $(function() {
         });
     });
 
-    drawingColor.on("change", function () {
+    drawingColor.on('change', function () {
         canvas.freeDrawingBrush.color = this.value;
     });
 
@@ -317,11 +317,11 @@ $(function() {
 
     $().on('keydown', null, 'F2', clear);
 
-    currentRoom.child("content").once("value", function (data) {
+    currentRoom.child('content').once('value', function (data) {
 
         let sync = new Sync();
 
-        currentRoom.child("map").on("value", function (map) {
+        currentRoom.child('map').on('value', function (map) {
             let value = map.val();
             let select = $('#background-options');
 
@@ -331,9 +331,9 @@ $(function() {
             }
         });
 
-        let queueRef = currentRoom.child("queue");
+        let queueRef = currentRoom.child('queue');
 
-        canvas.on("path:created", function(data) {
+        canvas.on('path:created', function(data) {
 
             if (sync.status) {
                 return;
@@ -356,7 +356,7 @@ $(function() {
 
         });
 
-        canvas.on("object:finish", function(data) {
+        canvas.on('object:finish', function(data) {
 
             if (sync.status) {
                 return;
@@ -372,6 +372,17 @@ $(function() {
                 time: Date.now().toString()
             });
 
+        });
+
+        canvas.on('object:added', function (data) {
+            if (sync.status) {
+                return;
+            }
+
+            data.target.set({
+                lockMovementX: true,
+                lockMovementY: true
+            })
         });
 
         canvas.on('canvas:cleared', function () {
@@ -394,7 +405,7 @@ $(function() {
 
         });
 
-        queueRef.on("child_added", function (child) {
+        queueRef.on('child_added', function (child) {
 
             let value = child.val();
             let timestamp = value.time;
@@ -432,7 +443,7 @@ $(function() {
         sync.on();
 
         canvas.loadFromJSON(JSON.parse(val));
-        currentRoom.child("map").once("value", function (content) {
+        currentRoom.child('map').once('value', function (content) {
             let val = content.val();
             setBackground(val);
         });
