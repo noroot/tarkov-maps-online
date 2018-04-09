@@ -24,9 +24,9 @@ fabric.Arrow = fabric.util.createClass(fabric.Line, {
         ctx.translate((this.x2 - this.x1) / 2, (this.y2 - this.y1) / 2);
         ctx.rotate(angle);
         ctx.beginPath();
-        ctx.moveTo(10, 0);
-        ctx.lineTo(-20, 15);
-        ctx.lineTo(-20, -15);
+        ctx.moveTo(this.strokeWidth + 25, 0);
+        ctx.lineTo(-2, this.strokeWidth + 5);
+        ctx.lineTo(-2, - this.strokeWidth - 5);
         ctx.closePath();
         ctx.fillStyle = this.stroke;
         ctx.fill();
